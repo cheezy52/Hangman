@@ -227,7 +227,7 @@ class ComputerPlayer < Player
       if letter != "_"
         regex_string << letter
       else
-        regex_string << "."
+        regex_string << "[^#{@guessed_letters.join("")}]"
       end
     end
     new_wordlist = []
