@@ -11,18 +11,22 @@ class Game
 
   def play
     self.clear_state
+
     @word_length = @checking_player.pick_secret_word
     self.create_blank_word
     puts @revealed_word
     @guessing_player.receive_secret_length(@word_length)
+    
     until self.over?
       current_guess = @guessing_player.guess
       result_indices = @checking_player.check_guess(current_guess)
       @guessing_player.handle_guess_response(current_guess, result_indices)
+      
       self.update_revealed_word(current_guess, result_indices)
       @misses += 1 if result_indices == []
       self.display_state
     end
+    
     puts "Game over."
   end
 
