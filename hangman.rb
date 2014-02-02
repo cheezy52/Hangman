@@ -23,12 +23,12 @@ class Game
       @misses += 1 if result_indices == []
       self.display_state
     end
-    puts "Game over.  Word was #{@checking_player.get_secret_word}"
+    puts "Game over."
   end
 
   def over?
     if @misses > @max_misses
-      puts "Guessing player loses.  Better luck next time!"
+      puts "Guessing player loses.    Word was #{@checking_player.get_secret_word}"
       return true
     elsif @revealed_word.count("_") == 0
       puts "Guessing player wins!"
@@ -146,6 +146,7 @@ class ComputerPlayer < Player
     @guessed_letters = []
     @remaining_letters = []
     ("a".."z").each { |char| @remaining_letters << char }
+    @possible_words = []
   end
 
   def pick_secret_word
@@ -168,11 +169,22 @@ class ComputerPlayer < Player
     self.clear_state
     @word_length = length
     self.create_blank_word
+    @dictionary.each do |word|
+      @possible_words << word if word.length == length
+    end
   end
 
   def guess
-    #Initial random guessing - to be improved later
-    guess = @remaining_letters.sample
+    letter_frequencies = {}
+    @remaining_letters.each { |letter| letter_frequencies[letter] = 0 }
+    @possible_words.each do |word|
+      word.split("").each do |letter|
+        if letter_frequencies.keys.include?(letter)
+          letter_frequencies[letter] += 1
+        end
+      end
+    end
+    guess = letter_frequencies.key(letter_frequencies.values.max)
     @guessed_letters << guess
     @remaining_letters.delete(guess)
     guess
@@ -190,6 +202,7 @@ class ComputerPlayer < Player
     indices.each do |index|
       @revealed_word[index] = guess
     end
+    self.update_possible_words
   end
 
   def create_blank_word
@@ -207,4 +220,31 @@ class ComputerPlayer < Player
   def get_secret_word
     @secret_word
   end
+
+  def update_possible_words
+    regex_string = ""
+    @revealed_word.split("").each do |letter|
+      if letter != "_"
+        regex_string << letter
+      else
+        regex_string << "."
+      end
+    end
+    new_wordlist = []
+    p regex_string
+    @possible_words.each do |word|
+      unless word.match(regex_string).nil?
+        new_wordlist << word
+      end
+    end
+    p new_wordlist
+    @possible_words = new_wordlist
+  end
+end
+
+if __FILE__ == $PROGRAM_NAME
+  p1 = HumanPlayer.new;nil
+  p2 = ComputerPlayer.new;nil
+  hangman = Game.new(p2, p1);nil
+  hangman.play
 end
