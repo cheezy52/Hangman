@@ -1,10 +1,12 @@
+require 'set'
+
 class WordChains
   def initialize(start_word, target_word, dict_path = "dictionary.txt")
     @start_word = start_word
     @target_word = target_word
     @dictionary = File.readlines(dict_path).map(&:chomp)
     @words_to_expand = [start_word]
-    @candidate_words = []
+    @candidate_words = Set.new []
     self.populate_candidates
     @reachable_words = [start_word]
   end
@@ -25,17 +27,17 @@ class WordChains
 
   def adjacent_words(word)
     adjacent_words = []
-    #Using regex mostly for regex practice - slicing would work about as well
-    regex_strings = []
+    might_be_words = []
     (0...word.length).each do |index|
-      regex_strings[index] = word.dup
-      regex_strings[index][index] = "."
+      ("a".."z").each do |letter|
+        temp_word = word.dup
+        temp_word[index] = letter
+        might_be_words << temp_word
+      end
     end
-    @candidate_words.each do |word|
-      regex_strings.each do |regex_string|
-        if word.match(regex_string)
-          adjacent_words << word
-        end
+    might_be_words.each do |word|
+      if @candidate_words.include?(word)
+        adjacent_words << word
       end
     end
     adjacent_words
