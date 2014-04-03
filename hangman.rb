@@ -235,13 +235,11 @@ class ComputerPlayer < Player
       end
     end
     new_wordlist = []
-    p regex_string
     @possible_words.each do |word|
       unless word.match(regex_string).nil?
         new_wordlist << word
       end
     end
-    p new_wordlist
     @possible_words = new_wordlist
   end
 end
@@ -249,6 +247,6 @@ end
 if __FILE__ == $PROGRAM_NAME
   p1 = HumanPlayer.new;nil
   p2 = ComputerPlayer.new;nil
-  hangman = Game.new(p2, p1);nil
+  hangman = Game.new(p1, p2);nil
   hangman.play
 end
